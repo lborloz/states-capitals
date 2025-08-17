@@ -3,29 +3,29 @@
 ## 1. Project Setup and Structure
 
 ### 1.1 Create Basic File Structure
-- [ ] Create `index.html` - Main application entry point
-- [ ] Create `styles.css` - CSS styling and responsive design
-- [ ] Create `script.js` - Core application logic
-- [ ] Create `map.js` - USA map handling and state highlighting
-- [ ] Create `data.js` - States and capitals data
+- [x] Create `index.html` - Main application entry point
+- [x] Create `styles.css` - CSS styling and responsive design
+- [x] Create `script.js` - Core application logic
+- [x] Create `map.js` - USA map handling and state highlighting
+- [x] Create `data.js` - States and capitals data
 
 ### 1.2 Set Up Development Environment
-- [ ] Implement basic HTML5 structure
-- [ ] Link CSS and JavaScript files
-- [ ] Set up local development server testing
+- [x] Implement basic HTML5 structure
+- [x] Link CSS and JavaScript files
+- [x] Set up local development server testing
 
 ## 2. Data Layer Implementation
 
 ### 2.1 States and Capitals Data Structure
-- [ ] Create comprehensive array of all 50 US states
-- [ ] Include state names, capitals, and identifiers for map integration
-- [ ] Structure data for easy quiz generation
+- [x] Create comprehensive array of all 50 US states
+- [x] Include state names, capitals, and identifiers for map integration
+- [x] Structure data for easy quiz generation
 
 ### 2.2 Quiz Question Generation
-- [ ] Implement function to generate "What is the capital of [state]?" questions
-- [ ] Implement function to generate "Which state has [capital] as its capital?" questions
-- [ ] Create multiple choice answer generation with 4 options per question
-- [ ] Implement question randomization logic
+- [x] Implement function to generate "What is the capital of [state]?" questions
+- [x] Implement function to generate "Which state has [capital] as its capital?" questions
+- [x] Create multiple choice answer generation with 4 options per question
+- [x] Implement question randomization logic
 
 ## 3. USA Map Integration
 

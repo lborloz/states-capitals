@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USA States and Capitals Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Quiz Type Selection Screen -->
+        <div id="quiz-selection" class="screen active">
+            <header>
+                <h1>USA States and Capitals Quiz</h1>
+                <p>Test your knowledge of US geography!</p>
+            </header>
+            <div class="quiz-type-buttons">
+                <button id="states-quiz-btn" class="quiz-type-btn">
+                    <h2>States Quiz</h2>
+                    <p>Name the state for each capital</p>
+                </button>
+                <button id="capitals-quiz-btn" class="quiz-type-btn">
+                    <h2>Capitals Quiz</h2>
+                    <p>Name the capital for each state</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="screen">
+            <header class="quiz-header">
+                <div class="quiz-info">
+                    <h2 id="quiz-title">Quiz</h2>
+                    <div class="progress">
+                        <span id="question-counter">Question 1 of 50</span>
+                        <span id="score-display">Score: 0/0</span>
+                    </div>
+                </div>
+                <button id="start-over-btn" class="start-over-btn">Start Over</button>
+            </header>
+
+            <main class="quiz-content">
+                <div class="map-container">
+                    <div id="usa-map">
+                        <!-- SVG Map will be inserted here -->
+                    </div>
+                </div>
+
+                <div class="question-container">
+                    <div class="question">
+                        <h3 id="question-text">Loading question...</h3>
+                    </div>
+
+                    <div class="answers">
+                        <button class="answer-btn" data-answer="0">
+                            <span class="answer-letter">A</span>
+                            <span class="answer-text">Answer A</span>
+                        </button>
+                        <button class="answer-btn" data-answer="1">
+                            <span class="answer-letter">B</span>
+                            <span class="answer-text">Answer B</span>
+                        </button>
+                        <button class="answer-btn" data-answer="2">
+                            <span class="answer-letter">C</span>
+                            <span class="answer-text">Answer C</span>
+                        </button>
+                        <button class="answer-btn" data-answer="3">
+                            <span class="answer-letter">D</span>
+                            <span class="answer-text">Answer D</span>
+                        </button>
+                    </div>
+
+                    <div id="feedback" class="feedback hidden">
+                        <p id="feedback-text"></p>
+                        <button id="next-question-btn">Next Question</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="screen">
+            <header>
+                <h2>Quiz Complete!</h2>
+            </header>
+            
+            <div class="results-content">
+                <div class="final-score">
+                    <h3>Your Score</h3>
+                    <div id="final-score-display">0/50 (0%)</div>
+                </div>
+
+                <div class="results-actions">
+                    <button id="review-answers-btn">Review Answers</button>
+                    <button id="new-quiz-btn">Take Another Quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Screen -->
+        <div id="review-screen" class="screen">
+            <header>
+                <h2>Answer Review</h2>
+                <button id="back-to-results-btn">Back to Results</button>
+            </header>
+            
+            <div class="review-content">
+                <div id="review-list">
+                    <!-- Review items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="map.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
