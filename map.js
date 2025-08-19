@@ -58,17 +58,7 @@ class USAMap {
                     }
                 });
 
-                // Add title to the map
-                const mapTitle = document.createElement('div');
-                mapTitle.className = 'map-title';
-                mapTitle.textContent = 'United States Map';
-                mapTitle.style.textAlign = 'center';
-                mapTitle.style.marginBottom = '1rem';
-                mapTitle.style.fontWeight = 'bold';
-                mapTitle.style.color = '#495057';
-
                 this.mapContainer.innerHTML = '';
-                this.mapContainer.appendChild(mapTitle);
                 this.mapContainer.appendChild(svgElement);
             }
         } catch (error) {
@@ -115,16 +105,7 @@ class USAMap {
 
         svg.appendChild(text);
 
-        const mapTitle = document.createElement('div');
-        mapTitle.className = 'map-title';
-        mapTitle.textContent = 'United States Map';
-        mapTitle.style.textAlign = 'center';
-        mapTitle.style.marginBottom = '1rem';
-        mapTitle.style.fontWeight = 'bold';
-        mapTitle.style.color = '#495057';
-
         this.mapContainer.innerHTML = '';
-        this.mapContainer.appendChild(mapTitle);
         this.mapContainer.appendChild(svg);
     }
 
