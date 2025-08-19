@@ -120,8 +120,18 @@
     </div>
 
     <!-- Scripts -->
-    <script src="data.js"></script>
-    <script src="map.js"></script>
-    <script src="script.js"></script>
+    <script>
+        // Cache busting timestamp
+        const cacheBuster = Date.now();
+        document.write('<script src="data.js?v=' + cacheBuster + '"><\/script>');
+        document.write('<script src="map.js?v=' + cacheBuster + '"><\/script>');
+        document.write('<script src="script.js?v=' + cacheBuster + '"><\/script>');
+        
+        // Update CSS link with cache busting
+        const cssLink = document.querySelector('link[rel="stylesheet"]');
+        if (cssLink) {
+            cssLink.href = `styles.css?v=${cacheBuster}`;
+        }
+    </script>
 </body>
 </html>
