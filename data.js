@@ -54,24 +54,25 @@ const STATES_DATA = [
 
 // Quiz Types
 const QUIZ_TYPES = {
+    IDENTIFY_STATES: 'identify-states',
     STATES: 'states',
-    CAPITALS: 'capitals'
+    CAPITALS: 'capitals',
 };
 
 // Common wrong answers for better multiple choice generation
 const COMMON_CAPITALS = [
-    'Atlanta', 'Austin', 'Boston', 'Charleston', 'Chicago', 'Columbus', 
-    'Denver', 'Detroit', 'Houston', 'Indianapolis', 'Jacksonville', 
-    'Las Vegas', 'Los Angeles', 'Miami', 'Milwaukee', 'Nashville', 
-    'New Orleans', 'New York City', 'Philadelphia', 'Phoenix', 
+    'Atlanta', 'Austin', 'Boston', 'Charleston', 'Chicago', 'Columbus',
+    'Denver', 'Detroit', 'Houston', 'Indianapolis', 'Jacksonville',
+    'Las Vegas', 'Los Angeles', 'Miami', 'Milwaukee', 'Nashville',
+    'New Orleans', 'New York City', 'Philadelphia', 'Phoenix',
     'Portland', 'San Antonio', 'Seattle', 'Tampa', 'Virginia Beach'
 ];
 
 const COMMON_STATES = [
     'Alabama', 'Arizona', 'California', 'Colorado', 'Florida', 'Georgia',
-    'Illinois', 'Indiana', 'Louisiana', 'Maryland', 'Massachusetts', 
-    'Michigan', 'Minnesota', 'Missouri', 'Nevada', 'New York', 
-    'North Carolina', 'Ohio', 'Pennsylvania', 'Tennessee', 'Texas', 
+    'Illinois', 'Indiana', 'Louisiana', 'Maryland', 'Massachusetts',
+    'Michigan', 'Minnesota', 'Missouri', 'Nevada', 'New York',
+    'North Carolina', 'Ohio', 'Pennsylvania', 'Tennessee', 'Texas',
     'Virginia', 'Washington', 'Wisconsin'
 ];
 
@@ -113,7 +114,7 @@ function generateCapitalQuestion(state) {
     const correctAnswer = state.capital;
     const wrongAnswers = generateWrongCapitals(correctAnswer, 3);
     const allAnswers = shuffleArray([correctAnswer, ...wrongAnswers]);
-    
+
     return {
         type: QUIZ_TYPES.CAPITALS,
         question: `What is the capital of ${state.name}?`,
@@ -128,7 +129,7 @@ function generateStateQuestion(state) {
     const correctAnswer = state.name;
     const wrongAnswers = generateWrongStates(correctAnswer, 3);
     const allAnswers = shuffleArray([correctAnswer, ...wrongAnswers]);
-    
+
     return {
         type: QUIZ_TYPES.STATES,
         question: `Which state has ${state.capital} as its capital?`,
@@ -139,38 +140,57 @@ function generateStateQuestion(state) {
     };
 }
 
+function generateIdentifyStateQuestion(state) {
+    const correctAnswer = state.name;
+    const wrongAnswers = generateWrongStates(correctAnswer, 3);
+    const allAnswers = shuffleArray([correctAnswer, ...wrongAnswers]);
+
+    return {
+        type: QUIZ_TYPES.IDENTIFY_STATES,
+        question: `What is the name of the highlighted state?`,
+        correctAnswer: correctAnswer,
+        options: allAnswers,
+        stateId: state.id,
+        stateName: state.name
+    };
+}
+
 function generateWrongCapitals(correctCapital, count = 3) {
     const allCapitals = STATES_DATA.map(state => state.capital);
     const wrongCapitals = allCapitals.filter(capital => capital !== correctCapital);
-    
+
     // Mix actual capitals with common wrong answers
     const mixedOptions = [...wrongCapitals, ...COMMON_CAPITALS];
     const uniqueOptions = [...new Set(mixedOptions)].filter(capital => capital !== correctCapital);
-    
+
     return shuffleArray(uniqueOptions).slice(0, count);
 }
 
 function generateWrongStates(correctState, count = 3) {
     const allStates = STATES_DATA.map(state => state.name);
     const wrongStates = allStates.filter(state => state !== correctState);
-    
+
     // Mix actual states with common wrong answers
     const mixedOptions = [...wrongStates, ...COMMON_STATES];
     const uniqueOptions = [...new Set(mixedOptions)].filter(state => state !== correctState);
-    
+
     return shuffleArray(uniqueOptions).slice(0, count);
 }
 
 function generateQuiz(type, numberOfQuestions = 50) {
     const shuffledStates = shuffleArray(STATES_DATA);
     const selectedStates = shuffledStates.slice(0, numberOfQuestions);
-    
+
     const questions = selectedStates.map(state => {
-        return type === QUIZ_TYPES.CAPITALS ? 
-            generateCapitalQuestion(state) : 
-            generateStateQuestion(state);
+        if (type === QUIZ_TYPES.CAPITALS) {
+            return generateCapitalQuestion(state);
+        } else if (type === QUIZ_TYPES.IDENTIFY_STATES) {
+            return generateIdentifyStateQuestion(state);
+        } else {
+            return generateStateQuestion(state);
+        }
     });
-    
+
     return {
         type: type,
         questions: questions,

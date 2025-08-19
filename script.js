@@ -26,6 +26,7 @@ class QuizApp {
         this.buttons = {
             statesQuiz: document.getElementById('states-quiz-btn'),
             capitalsQuiz: document.getElementById('capitals-quiz-btn'),
+            identifyStatesQuiz: document.getElementById('identify-states-quiz-btn'),
             startOver: document.getElementById('start-over-btn'),
             nextQuestion: document.getElementById('next-question-btn'),
             reviewAnswers: document.getElementById('review-answers-btn'),
@@ -51,6 +52,7 @@ class QuizApp {
         // Quiz type selection
         this.buttons.statesQuiz.addEventListener('click', () => this.startQuiz(QUIZ_TYPES.STATES));
         this.buttons.capitalsQuiz.addEventListener('click', () => this.startQuiz(QUIZ_TYPES.CAPITALS));
+        this.buttons.identifyStatesQuiz.addEventListener('click', () => this.startQuiz(QUIZ_TYPES.IDENTIFY_STATES));
 
         // Quiz controls
         this.buttons.startOver.addEventListener('click', () => this.startOver());
@@ -88,7 +90,13 @@ class QuizApp {
         this.questions = this.generateQuestions(quizType);
         
         // Update quiz title
-        this.quizTitle.textContent = quizType === QUIZ_TYPES.STATES ? 'States Quiz' : 'Capitals Quiz';
+        if (quizType === QUIZ_TYPES.STATES) {
+            this.quizTitle.textContent = 'States Quiz';
+        } else if (quizType === QUIZ_TYPES.CAPITALS) {
+            this.quizTitle.textContent = 'Capitals Quiz';
+        } else if (quizType === QUIZ_TYPES.IDENTIFY_STATES) {
+            this.quizTitle.textContent = 'Identify States Quiz';
+        }
         
         this.showScreen('quiz-screen');
         this.displayQuestion();
@@ -111,6 +119,19 @@ class QuizApp {
                     answers: answers,
                     correctAnswer: state.capital,
                     correctIndex: answers.indexOf(state.capital)
+                });
+            } else if (quizType === QUIZ_TYPES.IDENTIFY_STATES) {
+                // "What is the name of the highlighted state?"
+                const wrongAnswers = this.getWrongStates(state.name, 3);
+                const answers = shuffleArray([state.name, ...wrongAnswers]);
+                
+                questions.push({
+                    type: QUIZ_TYPES.IDENTIFY_STATES,
+                    state: state,
+                    question: `What is the name of the highlighted state?`,
+                    answers: answers,
+                    correctAnswer: state.name,
+                    correctIndex: answers.indexOf(state.name)
                 });
             } else {
                 // "Which state has [capital] as its capital?"

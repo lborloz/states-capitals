@@ -7,96 +7,114 @@ class USAMap {
     }
 
     createMap() {
-        // Create simplified SVG map of the USA
+        // Create accurate SVG map of the USA using proper SVG content
+        this.loadUSAMapSVG();
+    }
+
+    async loadUSAMapSVG() {
+        try {
+            // Load the SVG content from the us-map.svg file
+            const response = await fetch('us-map.svg');
+            const svgContent = await response.text();
+
+            // Parse the SVG content
+            const parser = new DOMParser();
+            const svgDoc = parser.parseFromString(svgContent, 'image/svg+xml');
+            const svgElement = svgDoc.querySelector('svg');
+
+            if (svgElement) {
+                // Set proper viewBox and dimensions
+                svgElement.setAttribute('viewBox', '0 0 1000 589');
+                svgElement.setAttribute('width', '100%');
+                svgElement.setAttribute('height', 'auto');
+                svgElement.setAttribute('style', 'stroke-linejoin: round; stroke:#ccc; fill: #f9f9f9;');
+
+                // Find all state paths and update their attributes
+                const statePaths = svgElement.querySelectorAll('path[id]');
+                statePaths.forEach(path => {
+                    const stateCode = path.getAttribute('id');
+                    const stateName = path.getAttribute('data-name');
+
+                    if (stateCode && stateName) {
+                        // Convert state code to lowercase with dashes
+                        const stateId = this.convertStateCodeToId(stateCode);
+
+                        // Update attributes for our quiz application
+                        path.setAttribute('id', `state-${stateId}`);
+                        path.setAttribute('class', 'usa-map-state');
+                        path.setAttribute('data-state-id', stateId);
+                        path.setAttribute('data-state-name', stateName);
+
+                        // Remove any existing style and set our default
+                        path.removeAttribute('style');
+
+                        // Add title for accessibility
+                        let title = path.querySelector('title');
+                        if (!title) {
+                            title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                            path.appendChild(title);
+                        }
+                        title.textContent = stateName;
+                    }
+                });
+
+                // Add title to the map
+                const mapTitle = document.createElement('div');
+                mapTitle.className = 'map-title';
+                mapTitle.textContent = 'United States Map';
+                mapTitle.style.textAlign = 'center';
+                mapTitle.style.marginBottom = '1rem';
+                mapTitle.style.fontWeight = 'bold';
+                mapTitle.style.color = '#495057';
+
+                this.mapContainer.innerHTML = '';
+                this.mapContainer.appendChild(mapTitle);
+                this.mapContainer.appendChild(svgElement);
+            }
+        } catch (error) {
+            console.error('Failed to load USA map SVG:', error);
+            this.createFallbackMap();
+        }
+    }
+
+    convertStateCodeToId(stateCode) {
+        // Convert state codes to full names with dashes
+        const stateMapping = {
+            'AL': 'alabama', 'AK': 'alaska', 'AZ': 'arizona', 'AR': 'arkansas',
+            'CA': 'california', 'CO': 'colorado', 'CT': 'connecticut', 'DE': 'delaware',
+            'FL': 'florida', 'GA': 'georgia', 'HI': 'hawaii', 'ID': 'idaho',
+            'IL': 'illinois', 'IN': 'indiana', 'IA': 'iowa', 'KS': 'kansas',
+            'KY': 'kentucky', 'LA': 'louisiana', 'ME': 'maine', 'MD': 'maryland',
+            'MA': 'massachusetts', 'MI': 'michigan', 'MN': 'minnesota', 'MS': 'mississippi',
+            'MO': 'missouri', 'MT': 'montana', 'NE': 'nebraska', 'NV': 'nevada',
+            'NH': 'new-hampshire', 'NJ': 'new-jersey', 'NM': 'new-mexico', 'NY': 'new-york',
+            'NC': 'north-carolina', 'ND': 'north-dakota', 'OH': 'ohio', 'OK': 'oklahoma',
+            'OR': 'oregon', 'PA': 'pennsylvania', 'RI': 'rhode-island', 'SC': 'south-carolina',
+            'SD': 'south-dakota', 'TN': 'tennessee', 'TX': 'texas', 'UT': 'utah',
+            'VT': 'vermont', 'VA': 'virginia', 'WA': 'washington', 'WV': 'west-virginia',
+            'WI': 'wisconsin', 'WY': 'wyoming', 'DC': 'district-of-columbia'
+        };
+        return stateMapping[stateCode] || stateCode.toLowerCase();
+    }
+
+    createFallbackMap() {
+        // Fallback to simple shapes if SVG loading fails
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-        svg.setAttribute('viewBox', '0 0 1000 600');
+        svg.setAttribute('viewBox', '0 0 1000 500');
         svg.setAttribute('width', '100%');
         svg.setAttribute('height', 'auto');
 
-        // Create simplified state shapes (rectangles positioned roughly geographically)
-        const states = [
-            // West Coast
-            { id: 'california', x: 50, y: 300, width: 80, height: 120, name: 'California' },
-            { id: 'oregon', x: 70, y: 220, width: 70, height: 80, name: 'Oregon' },
-            { id: 'washington', x: 80, y: 150, width: 80, height: 70, name: 'Washington' },
-            { id: 'nevada', x: 130, y: 280, width: 60, height: 100, name: 'Nevada' },
-            { id: 'arizona', x: 190, y: 350, width: 70, height: 80, name: 'Arizona' },
-            { id: 'utah', x: 190, y: 280, width: 60, height: 70, name: 'Utah' },
-            { id: 'idaho', x: 160, y: 180, width: 60, height: 100, name: 'Idaho' },
-            { id: 'alaska', x: 80, y: 480, width: 120, height: 80, name: 'Alaska' },
-            { id: 'hawaii', x: 250, y: 500, width: 60, height: 40, name: 'Hawaii' },
+        // Create a simple fallback message
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', '500');
+        text.setAttribute('y', '250');
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', '#666');
+        text.setAttribute('font-size', '24');
+        text.textContent = 'Map loading failed. Please refresh the page.';
 
-            // Mountain West
-            { id: 'montana', x: 220, y: 150, width: 100, height: 70, name: 'Montana' },
-            { id: 'wyoming', x: 250, y: 220, width: 80, height: 60, name: 'Wyoming' },
-            { id: 'colorado', x: 280, y: 280, width: 80, height: 70, name: 'Colorado' },
-            { id: 'new-mexico', x: 260, y: 350, width: 80, height: 80, name: 'New Mexico' },
-            { id: 'north-dakota', x: 320, y: 120, width: 80, height: 50, name: 'North Dakota' },
-            { id: 'south-dakota', x: 330, y: 170, width: 80, height: 50, name: 'South Dakota' },
-            { id: 'nebraska', x: 360, y: 220, width: 80, height: 50, name: 'Nebraska' },
-            { id: 'kansas', x: 380, y: 270, width: 80, height: 50, name: 'Kansas' },
-            { id: 'oklahoma', x: 400, y: 320, width: 90, height: 50, name: 'Oklahoma' },
-            { id: 'texas', x: 380, y: 370, width: 120, height: 130, name: 'Texas' },
+        svg.appendChild(text);
 
-            // Midwest
-            { id: 'minnesota', x: 410, y: 120, width: 70, height: 80, name: 'Minnesota' },
-            { id: 'wisconsin', x: 480, y: 140, width: 60, height: 70, name: 'Wisconsin' },
-            { id: 'iowa', x: 440, y: 200, width: 70, height: 50, name: 'Iowa' },
-            { id: 'missouri', x: 460, y: 250, width: 70, height: 70, name: 'Missouri' },
-            { id: 'arkansas', x: 490, y: 320, width: 60, height: 60, name: 'Arkansas' },
-            { id: 'louisiana', x: 500, y: 380, width: 70, height: 70, name: 'Louisiana' },
-            { id: 'illinois', x: 540, y: 180, width: 50, height: 90, name: 'Illinois' },
-            { id: 'indiana', x: 590, y: 180, width: 50, height: 80, name: 'Indiana' },
-            { id: 'michigan', x: 580, y: 130, width: 70, height: 80, name: 'Michigan' },
-            { id: 'ohio', x: 640, y: 180, width: 60, height: 70, name: 'Ohio' },
-            { id: 'kentucky', x: 600, y: 250, width: 80, height: 40, name: 'Kentucky' },
-            { id: 'tennessee', x: 580, y: 290, width: 90, height: 40, name: 'Tennessee' },
-            { id: 'mississippi', x: 550, y: 330, width: 50, height: 70, name: 'Mississippi' },
-            { id: 'alabama', x: 600, y: 330, width: 50, height: 80, name: 'Alabama' },
-
-            // South
-            { id: 'florida', x: 680, y: 400, width: 90, height: 80, name: 'Florida' },
-            { id: 'georgia', x: 650, y: 330, width: 60, height: 80, name: 'Georgia' },
-            { id: 'south-carolina', x: 710, y: 320, width: 50, height: 60, name: 'South Carolina' },
-            { id: 'north-carolina', x: 700, y: 270, width: 80, height: 50, name: 'North Carolina' },
-            { id: 'virginia', x: 720, y: 220, width: 70, height: 50, name: 'Virginia' },
-            { id: 'west-virginia', x: 680, y: 200, width: 50, height: 50, name: 'West Virginia' },
-
-            // Northeast
-            { id: 'pennsylvania', x: 740, y: 180, width: 80, height: 50, name: 'Pennsylvania' },
-            { id: 'new-york', x: 780, y: 130, width: 70, height: 70, name: 'New York' },
-            { id: 'vermont', x: 850, y: 120, width: 30, height: 50, name: 'Vermont' },
-            { id: 'new-hampshire', x: 880, y: 120, width: 30, height: 50, name: 'New Hampshire' },
-            { id: 'maine', x: 910, y: 100, width: 40, height: 80, name: 'Maine' },
-            { id: 'massachusetts', x: 850, y: 170, width: 60, height: 30, name: 'Massachusetts' },
-            { id: 'rhode-island', x: 910, y: 180, width: 20, height: 20, name: 'Rhode Island' },
-            { id: 'connecticut', x: 820, y: 180, width: 40, height: 25, name: 'Connecticut' },
-            { id: 'new-jersey', x: 790, y: 200, width: 35, height: 50, name: 'New Jersey' },
-            { id: 'delaware', x: 770, y: 220, width: 20, height: 30, name: 'Delaware' },
-            { id: 'maryland', x: 750, y: 230, width: 50, height: 30, name: 'Maryland' }
-        ];
-
-        // Create state elements
-        states.forEach(state => {
-            const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            rect.setAttribute('id', `state-${state.id}`);
-            rect.setAttribute('class', 'usa-map-state');
-            rect.setAttribute('x', state.x);
-            rect.setAttribute('y', state.y);
-            rect.setAttribute('width', state.width);
-            rect.setAttribute('height', state.height);
-            rect.setAttribute('data-state-id', state.id);
-            rect.setAttribute('data-state-name', state.name);
-            
-            // Add title for accessibility
-            const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-            title.textContent = state.name;
-            rect.appendChild(title);
-
-            svg.appendChild(rect);
-        });
-
-        // Add title to the map
         const mapTitle = document.createElement('div');
         mapTitle.className = 'map-title';
         mapTitle.textContent = 'United States Map';
@@ -108,6 +126,12 @@ class USAMap {
         this.mapContainer.innerHTML = '';
         this.mapContainer.appendChild(mapTitle);
         this.mapContainer.appendChild(svg);
+    }
+
+    formatStateName(stateId) {
+        return stateId.split('-').map(word =>
+            word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
     }
 
     highlightState(stateId) {
