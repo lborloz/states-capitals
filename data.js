@@ -147,7 +147,7 @@ function generateIdentifyStateQuestion(state) {
 
     return {
         type: QUIZ_TYPES.IDENTIFY_STATES,
-        question: `What is the name of the highlighted state?`,
+        question: `What is the name of this state?`,
         correctAnswer: correctAnswer,
         options: allAnswers,
         stateId: state.id,

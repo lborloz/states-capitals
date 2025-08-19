@@ -7,7 +7,7 @@ class QuizApp {
         this.score = 0;
         this.userAnswers = [];
         this.isAnswered = false;
-        
+
         this.initializeElements();
         this.bindEvents();
         this.showScreen('quiz-selection');
@@ -88,7 +88,7 @@ class QuizApp {
         this.score = 0;
         this.userAnswers = [];
         this.questions = this.generateQuestions(quizType);
-        
+
         // Update quiz title
         if (quizType === QUIZ_TYPES.STATES) {
             this.quizTitle.textContent = 'States Quiz';
@@ -97,7 +97,7 @@ class QuizApp {
         } else if (quizType === QUIZ_TYPES.IDENTIFY_STATES) {
             this.quizTitle.textContent = 'Identify States Quiz';
         }
-        
+
         this.showScreen('quiz-screen');
         this.displayQuestion();
     }
@@ -111,7 +111,7 @@ class QuizApp {
                 // "What is the capital of [state]?"
                 const wrongAnswers = this.getWrongCapitals(state.capital, 3);
                 const answers = shuffleArray([state.capital, ...wrongAnswers]);
-                
+
                 questions.push({
                     type: QUIZ_TYPES.CAPITALS,
                     state: state,
@@ -121,14 +121,14 @@ class QuizApp {
                     correctIndex: answers.indexOf(state.capital)
                 });
             } else if (quizType === QUIZ_TYPES.IDENTIFY_STATES) {
-                // "What is the name of the highlighted state?"
+                // "What is the name of this state?"
                 const wrongAnswers = this.getWrongStates(state.name, 3);
                 const answers = shuffleArray([state.name, ...wrongAnswers]);
-                
+
                 questions.push({
                     type: QUIZ_TYPES.IDENTIFY_STATES,
                     state: state,
-                    question: `What is the name of the highlighted state?`,
+                    question: `What is the name of this state?`,
                     answers: answers,
                     correctAnswer: state.name,
                     correctIndex: answers.indexOf(state.name)
@@ -137,7 +137,7 @@ class QuizApp {
                 // "Which state has [capital] as its capital?"
                 const wrongAnswers = this.getWrongStates(state.name, 3);
                 const answers = shuffleArray([state.name, ...wrongAnswers]);
-                
+
                 questions.push({
                     type: QUIZ_TYPES.STATES,
                     state: state,
@@ -155,24 +155,24 @@ class QuizApp {
     getWrongCapitals(correctCapital, count) {
         const allCapitals = STATES_DATA.map(state => state.capital).filter(cap => cap !== correctCapital);
         const commonWrongAnswers = COMMON_CAPITALS.filter(cap => cap !== correctCapital);
-        
+
         // Prefer common wrong answers, but fall back to random capitals if needed
         const candidates = [...commonWrongAnswers, ...allCapitals];
         const unique = [...new Set(candidates)];
         const shuffled = shuffleArray(unique);
-        
+
         return shuffled.slice(0, count);
     }
 
     getWrongStates(correctState, count) {
         const allStates = STATES_DATA.map(state => state.name).filter(name => name !== correctState);
         const commonWrongAnswers = COMMON_STATES.filter(name => name !== correctState);
-        
+
         // Prefer common wrong answers, but fall back to random states if needed
         const candidates = [...commonWrongAnswers, ...allStates];
         const unique = [...new Set(candidates)];
         const shuffled = shuffleArray(unique);
-        
+
         return shuffled.slice(0, count);
     }
 
@@ -194,7 +194,7 @@ class QuizApp {
         this.answerButtons.forEach((button, index) => {
             const answerText = button.querySelector('.answer-text');
             answerText.textContent = question.answers[index] || '';
-            
+
             // Reset button states
             button.classList.remove('selected', 'correct', 'incorrect');
             button.disabled = false;
@@ -221,11 +221,11 @@ class QuizApp {
         // Update button states
         this.answerButtons.forEach((button, index) => {
             button.disabled = true;
-            
+
             if (index === answerIndex) {
                 button.classList.add('selected');
             }
-            
+
             if (index === question.correctIndex) {
                 button.classList.add('correct');
             } else if (index === answerIndex && !isCorrect) {
@@ -252,10 +252,10 @@ class QuizApp {
     }
 
     showFeedback(isCorrect, correctAnswer) {
-        this.feedbackText.textContent = isCorrect 
-            ? 'Correct! Well done!' 
+        this.feedbackText.textContent = isCorrect
+            ? 'Correct! Well done!'
             : `Incorrect. The correct answer is ${correctAnswer}.`;
-        
+
         this.feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
         this.feedback.classList.remove('hidden');
 
@@ -275,7 +275,7 @@ class QuizApp {
     showResults() {
         const percentage = Math.round((this.score / this.questions.length) * 100);
         this.finalScoreDisplay.textContent = `${this.score}/${this.questions.length} (${percentage}%)`;
-        
+
         this.showScreen('results-screen');
 
         // Clear map highlighting
@@ -290,13 +290,13 @@ class QuizApp {
         this.userAnswers.forEach((answer, index) => {
             const reviewItem = document.createElement('div');
             reviewItem.className = `review-item ${answer.isCorrect ? 'correct' : 'incorrect'}`;
-            
+
             reviewItem.innerHTML = `
                 <div class="review-question">${index + 1}. ${answer.question}</div>
                 <div class="review-answer user">Your answer: ${answer.userAnswer}</div>
                 ${!answer.isCorrect ? `<div class="review-answer correct">Correct answer: ${answer.correctAnswer}</div>` : ''}
             `;
-            
+
             this.reviewList.appendChild(reviewItem);
         });
 
