@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USA States and Capitals Quiz</title>
+    <title>US States and Capitals Quiz</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -11,20 +11,20 @@
         <!-- Quiz Type Selection Screen -->
         <div id="quiz-selection" class="screen active">
             <header>
-                <h1>USA States and Capitals Quiz</h1>
+                <h1>US States and Capitals</h1>
                 <p>Test your knowledge of US geography!</p>
             </header>
             <div class="quiz-type-buttons">
                 <button id="identify-states-quiz-btn" class="quiz-type-btn">
-                    <h2>Identify States Quiz</h2>
+                    <h2>Identify States</h2>
                     <p>Name the highlighted state</p>
                 </button>
                 <button id="states-quiz-btn" class="quiz-type-btn">
-                    <h2>States Quiz</h2>
+                    <h2>States from Capitals</h2>
                     <p>Name the state for each capital</p>
                 </button>
                 <button id="capitals-quiz-btn" class="quiz-type-btn">
-                    <h2>Capitals Quiz</h2>
+                    <h2>Capitals from States</h2>
                     <p>Name the capital for each state</p>
                 </button>
             </div>
@@ -126,7 +126,7 @@
         document.write('<script src="data.js?v=' + cacheBuster + '"><\/script>');
         document.write('<script src="map.js?v=' + cacheBuster + '"><\/script>');
         document.write('<script src="script.js?v=' + cacheBuster + '"><\/script>');
-        
+
         // Update CSS link with cache busting
         const cssLink = document.querySelector('link[rel="stylesheet"]');
         if (cssLink) {
