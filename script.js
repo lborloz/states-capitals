@@ -7,6 +7,11 @@ class QuizApp {
         this.score = 0;
         this.userAnswers = [];
         this.isAnswered = false;
+        
+        // Timer properties
+        this.startTime = null;
+        this.endTime = null;
+        this.completionTimeSeconds = 0;
 
         this.initializeElements();
         this.bindEvents();
@@ -19,7 +24,8 @@ class QuizApp {
             selection: document.getElementById('quiz-selection'),
             quiz: document.getElementById('quiz-screen'),
             results: document.getElementById('results-screen'),
-            review: document.getElementById('review-screen')
+            review: document.getElementById('review-screen'),
+            bestScores: document.getElementById('best-scores-screen')
         };
 
         // Buttons
@@ -31,7 +37,11 @@ class QuizApp {
             nextQuestion: document.getElementById('next-question-btn'),
             reviewAnswers: document.getElementById('review-answers-btn'),
             newQuiz: document.getElementById('new-quiz-btn'),
-            backToResults: document.getElementById('back-to-results-btn')
+            backToResults: document.getElementById('back-to-results-btn'),
+            viewBestScores: document.getElementById('view-best-scores-btn'),
+            viewBestScoresFromResults: document.getElementById('view-best-scores-from-results-btn'),
+            backToMainMenu: document.getElementById('back-to-main-menu-btn'),
+            clearScores: document.getElementById('clear-scores-btn')
         };
 
         // Quiz elements
@@ -45,7 +55,13 @@ class QuizApp {
 
         // Results elements
         this.finalScoreDisplay = document.getElementById('final-score-display');
+        this.completionTimeDisplay = document.getElementById('completion-time-display');
         this.reviewList = document.getElementById('review-list');
+
+        // Best scores elements
+        this.quizTypeTabs = document.querySelectorAll('.quiz-type-tab');
+        this.bestScoresList = document.getElementById('best-scores-list');
+        this.currentBestScoresTab = 'identify-states';
     }
 
     bindEvents() {
@@ -62,6 +78,17 @@ class QuizApp {
         this.buttons.reviewAnswers.addEventListener('click', () => this.showReview());
         this.buttons.newQuiz.addEventListener('click', () => this.startOver());
         this.buttons.backToResults.addEventListener('click', () => this.showScreen('results-screen'));
+
+        // Best scores navigation
+        this.buttons.viewBestScores.addEventListener('click', () => this.showBestScores());
+        this.buttons.viewBestScoresFromResults.addEventListener('click', () => this.showBestScores());
+        this.buttons.backToMainMenu.addEventListener('click', () => this.startOver());
+        this.buttons.clearScores.addEventListener('click', () => this.clearCurrentQuizTypeScores());
+
+        // Best scores tabs
+        this.quizTypeTabs.forEach(tab => {
+            tab.addEventListener('click', () => this.switchBestScoresTab(tab.dataset.quizType));
+        });
 
         // Answer buttons
         this.answerButtons.forEach((button, index) => {
@@ -88,6 +115,9 @@ class QuizApp {
         this.score = 0;
         this.userAnswers = [];
         this.questions = this.generateQuestions(quizType);
+        
+        // Start the timer
+        this.startTimer();
 
         // Update quiz title
         if (quizType === QUIZ_TYPES.STATES) {
@@ -273,8 +303,15 @@ class QuizApp {
     }
 
     showResults() {
+        // Stop the timer and save the score
+        this.stopTimer();
+        this.saveBestScore();
+        
         const percentage = Math.round((this.score / this.questions.length) * 100);
         this.finalScoreDisplay.textContent = `${this.score}/${this.questions.length} (${percentage}%)`;
+        
+        // Display completion time
+        this.completionTimeDisplay.textContent = `Time: ${this.formatTime(this.completionTimeSeconds)}`;
 
         this.showScreen('results-screen');
 
@@ -310,6 +347,11 @@ class QuizApp {
         this.score = 0;
         this.userAnswers = [];
         this.isAnswered = false;
+        
+        // Reset timer
+        this.startTime = null;
+        this.endTime = null;
+        this.completionTimeSeconds = 0;
 
         // Clear map highlighting
         if (window.clearMapHighlight) {
@@ -317,6 +359,173 @@ class QuizApp {
         }
 
         this.showScreen('quiz-selection');
+    }
+
+    // Timer methods
+    startTimer() {
+        this.startTime = Date.now();
+    }
+
+    stopTimer() {
+        this.endTime = Date.now();
+        if (this.startTime) {
+            this.completionTimeSeconds = Math.floor((this.endTime - this.startTime) / 1000);
+        }
+    }
+
+    formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    // Best scores management
+    getBestScores(quizType = null) {
+        try {
+            const stored = localStorage.getItem('quiz-best-scores');
+            const allScores = stored ? JSON.parse(stored) : [];
+            
+            if (quizType) {
+                return allScores.filter(score => score.quizType === quizType);
+            }
+            
+            return allScores;
+        } catch (error) {
+            console.warn('Error loading best scores:', error);
+            return [];
+        }
+    }
+
+    saveBestScore() {
+        if (!this.currentQuizType || this.completionTimeSeconds === 0) return;
+
+        const newScore = {
+            quizType: this.currentQuizType,
+            score: this.score,
+            total: this.questions.length,
+            percentage: Math.round((this.score / this.questions.length) * 100),
+            timeSeconds: this.completionTimeSeconds,
+            timeFormatted: this.formatTime(this.completionTimeSeconds),
+            date: new Date().toISOString()
+        };
+
+        try {
+            const allScores = this.getBestScores();
+            const quizTypeScores = allScores.filter(score => score.quizType === this.currentQuizType);
+            const otherScores = allScores.filter(score => score.quizType !== this.currentQuizType);
+
+            // Add new score and sort by score (desc) then time (asc)
+            quizTypeScores.push(newScore);
+            quizTypeScores.sort((a, b) => {
+                if (b.score !== a.score) {
+                    return b.score - a.score; // Higher score first
+                }
+                return a.timeSeconds - b.timeSeconds; // Faster time first
+            });
+
+            // Keep only top 10 for this quiz type
+            const topScores = quizTypeScores.slice(0, 10);
+            
+            // Combine with other quiz types and save
+            const updatedScores = [...otherScores, ...topScores];
+            localStorage.setItem('quiz-best-scores', JSON.stringify(updatedScores));
+            
+            return true;
+        } catch (error) {
+            console.warn('Error saving best score:', error);
+            return false;
+        }
+    }
+
+    clearBestScores(quizType = null) {
+        try {
+            if (quizType) {
+                // Clear scores for specific quiz type
+                const allScores = this.getBestScores();
+                const filteredScores = allScores.filter(score => score.quizType !== quizType);
+                localStorage.setItem('quiz-best-scores', JSON.stringify(filteredScores));
+            } else {
+                // Clear all scores
+                localStorage.removeItem('quiz-best-scores');
+            }
+            return true;
+        } catch (error) {
+            console.warn('Error clearing best scores:', error);
+            return false;
+        }
+    }
+
+    // Best scores display methods
+    showBestScores() {
+        this.showScreen('best-scores-screen');
+        this.renderBestScores(this.currentBestScoresTab);
+    }
+
+    switchBestScoresTab(quizType) {
+        // Update active tab
+        this.quizTypeTabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.quizType === quizType);
+        });
+
+        this.currentBestScoresTab = quizType;
+        this.renderBestScores(quizType);
+    }
+
+    renderBestScores(quizType) {
+        const scores = this.getBestScores(quizType);
+        
+        if (scores.length === 0) {
+            this.bestScoresList.innerHTML = `
+                <div class="empty-scores">
+                    <p>No scores yet for this quiz type.</p>
+                    <p>Complete a quiz to see your best results here!</p>
+                </div>
+            `;
+            return;
+        }
+
+        const scoresHtml = scores.map((score, index) => {
+            const date = new Date(score.date).toLocaleDateString();
+            return `
+                <div class="best-score-item">
+                    <div class="rank">#${index + 1}</div>
+                    <div class="score-info">
+                        <div class="score">${score.score}/${score.total} (${score.percentage}%)</div>
+                        <div class="time-date">
+                            <span class="time">Time: ${score.timeFormatted}</span>
+                            <span class="date">${date}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        this.bestScoresList.innerHTML = scoresHtml;
+    }
+
+    clearCurrentQuizTypeScores() {
+        const quizTypeName = this.getQuizTypeName(this.currentBestScoresTab);
+        
+        if (confirm(`Are you sure you want to clear all scores for "${quizTypeName}"? This action cannot be undone.`)) {
+            if (this.clearBestScores(this.currentBestScoresTab)) {
+                this.renderBestScores(this.currentBestScoresTab);
+            } else {
+                alert('Failed to clear scores. Please try again.');
+            }
+        }
+    }
+
+    getQuizTypeName(quizType) {
+        switch (quizType) {
+            case QUIZ_TYPES.IDENTIFY_STATES:
+                return 'Identify States';
+            case QUIZ_TYPES.CAPITALS:
+                return 'Capitals from States';
+            case QUIZ_TYPES.STATES:
+                return 'States from Capitals';
+            default:
+                return 'Unknown Quiz Type';
+        }
     }
 }
 

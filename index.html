@@ -28,6 +28,12 @@
                     <p>Name the capital for each state</p>
                 </button>
             </div>
+            <div class="best-scores-link">
+                <button id="view-best-scores-btn" class="view-best-scores-btn">
+                    <h3>View Your Best Scores</h3>
+                    <p>See your top results for each quiz</p>
+                </button>
+            </div>
         </div>
 
         <!-- Quiz Screen -->
@@ -95,10 +101,14 @@
                 <div class="final-score">
                     <h3>Your Score</h3>
                     <div id="final-score-display">0/50 (0%)</div>
+                    <div class="completion-time">
+                        <span id="completion-time-display">Time: 0:00</span>
+                    </div>
                 </div>
 
                 <div class="results-actions">
                     <button id="review-answers-btn">Review Answers</button>
+                    <button id="view-best-scores-from-results-btn">View Best Scores</button>
                     <button id="new-quiz-btn">Take Another Quiz</button>
                 </div>
             </div>
@@ -114,6 +124,32 @@
             <div class="review-content">
                 <div id="review-list">
                     <!-- Review items will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Best Scores Screen -->
+        <div id="best-scores-screen" class="screen">
+            <header>
+                <h2>Best Scores</h2>
+                <button id="back-to-main-menu-btn">Back to Main Menu</button>
+            </header>
+
+            <div class="best-scores-content">
+                <div class="quiz-type-tabs">
+                    <button class="quiz-type-tab active" data-quiz-type="identify-states">Identify States</button>
+                    <button class="quiz-type-tab" data-quiz-type="capitals">Capitals from States</button>
+                    <button class="quiz-type-tab" data-quiz-type="states">States from Capitals</button>
+                </div>
+
+                <div class="scores-container">
+                    <div id="best-scores-list">
+                        <!-- Best scores will be populated by JavaScript -->
+                    </div>
+
+                    <div class="best-scores-actions">
+                        <button id="clear-scores-btn" class="clear-scores-btn">Clear Scores for This Quiz Type</button>
+                    </div>
                 </div>
             </div>
         </div>
